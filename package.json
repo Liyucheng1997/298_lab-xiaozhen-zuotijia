@@ -1,0 +1,14 @@
+{
+  "name": "xiaozhen-zuotijia",
+  "version": "0.1.0",
+  "description": "小镇做题家 —— 上传试卷/题目,LLM 识题并给出四层深度解答",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "katex": "^0.18.4",
+    "multer": "^2.2.0"
+  }
+}

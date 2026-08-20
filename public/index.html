@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>小镇做题家</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/vendor/katex/katex.min.css" />
+  <script defer src="/vendor/katex/katex.min.js"></script>
+  <script defer src="/vendor/katex/contrib/auto-render.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">📖</span>
+      <div>
+        <h1>小镇做题家</h1>
+        <p class="tagline">上传试卷 · 识题解答 · 四层深度 · 溯源课本</p>
+      </div>
+    </div>
+    <button id="historyBtn" class="ghost-btn">🕘 历史记录</button>
+  </header>
+
+  <main class="layout">
+    <!-- 左侧:输入区 -->
+    <section class="panel input-panel">
+      <h2>上传题目</h2>
+
+      <div id="dropZone" class="drop-zone">
+        <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.webp,.gif,.bmp,.pdf" multiple hidden />
+        <p class="drop-main">点击或拖拽到此处</p>
+        <p class="drop-sub">支持图片 / PDF,最多 6 个文件</p>
+      </div>
+      <div id="fileList" class="file-list"></div>
+
+      <div class="divider"><span>或直接粘贴题目</span></div>
+      <textarea id="textInput" rows="5" placeholder="把题目文字粘贴到这里……"></textarea>
+
+      <div class="hints-row">
+        <input type="text" id="subjectInput" placeholder="学科(可选,如:数学)" />
+        <input type="text" id="gradeInput" placeholder="年级(可选,如:初二)" />
+      </div>
+
+      <button id="solveBtn" class="primary-btn">🚀 开始解题</button>
+      <div id="status" class="status hidden"></div>
+    </section>
+
+    <!-- 右侧:结果区 -->
+    <section class="panel result-panel" id="resultPanel">
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">✏️</div>
+        <p>上传一张试卷照片,或粘贴一道题,<br />我会识别题目并给出四层深度的解答。</p>
+        <ul class="depth-legend">
+          <li><b>① 答案</b> —— 只看结果,快速对答案</li>
+          <li><b>② 讲解</b> —— 分步解题过程,像老师板书</li>
+          <li><b>③ 知识点</b> —— 考察点与易错点总结</li>
+          <li><b>④ 溯源</b> —— 定位到课本章节,回去翻书</li>
+        </ul>
+      </div>
+      <div id="results" class="hidden"></div>
+    </section>
+  </main>
+
+  <!-- 历史记录抽屉 -->
+  <div id="historyDrawer" class="drawer hidden">
+    <div class="drawer-head">
+      <h2>历史记录</h2>
+      <button id="closeHistory" class="ghost-btn">✕</button>
+    </div>
+    <div id="historyList" class="history-list"></div>
+  </div>
+  <div id="drawerMask" class="drawer-mask hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
