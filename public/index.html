@@ -81,16 +81,16 @@
       <h2>设置</h2>
       <p id="settingsBackendInfo" class="modal-hint"></p>
       <div id="apiFields">
-        <label class="modal-label">Anthropic API Key
-          <input type="password" id="setApiKey" placeholder="sk-ant-..." />
+        <label class="modal-label">反代 / Anthropic API Key
+          <input type="password" id="setApiKey" placeholder="unused" />
         </label>
-        <label class="modal-label">API 地址
-          <input type="text" id="setBaseUrl" placeholder="https://api.anthropic.com" />
+        <label class="modal-label">反代 / API 地址
+          <input type="text" id="setBaseUrl" placeholder="http://127.0.0.1:8787" />
         </label>
         <label class="modal-label">模型
-          <input type="text" id="setModel" placeholder="claude-sonnet-5" />
+          <input type="text" id="setModel" placeholder="haiku" />
         </label>
-        <p class="modal-hint">Key 只保存在你自己的浏览器(localStorage),识题请求由浏览器直接发给 API 地址,不经过任何中间服务器。API 地址也可填本机的 claude -p 反代(如 AI 额度 Monitor 的 <code>http://localhost:8787</code>,Key 任意填,走订阅额度)。</p>
+        <p class="modal-hint">默认调用本机的 claude -p 反代 <code>http://127.0.0.1:8787</code>，未启用鉴权时 Key 填 <code>unused</code>，走 Claude Code 订阅额度。也可改填 Anthropic 官方或其他兼容地址。设置只保存在当前浏览器。</p>
         <label class="modal-check">
           <input type="checkbox" id="setUseLocal" />
           优先使用本机 claude 服务(需在本机运行本项目,浏览器会询问本地网络访问权限)

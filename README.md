@@ -9,7 +9,7 @@
 | ③ 知识点 | 知识点、考察点、常见易错点总结 |
 | ④ 溯源 | 定位到课本(版本/年级/章节),回去翻书复习 |
 
-**🔗 在线使用:<https://zuotijia.liyucheng.me>**(在设置里填自己的 Anthropic API Key,浏览器直连、Key 只存本机)
+**🔗 在线使用:<https://zuotijia.liyucheng.me>**(默认调用本机 `http://127.0.0.1:8787` 的 Claude Code 反代，走订阅额度)
 
 ## AI 后端(三级自动切换)
 
@@ -17,7 +17,7 @@
 
 1. **同源服务器带 claude CLI**(本地 `npm start`):走 `claude -p` 订阅额度,无需 API Key,历史记录存服务器。
 2. **访问者本机的服务**:在线页面会探测你本机 `localhost:3299` 是否跑着本项目(CORS 已放行),跑着就优先用你自己的 claude 订阅额度。
-3. **浏览器直连 Anthropic API**:以上都没有时,在「⚙️ 设置」里填 API Key(只存 localStorage,请求由浏览器直发 Anthropic,不经过任何中间服务器),图片/PDF 在浏览器里转 base64 直接发给模型,历史记录存本浏览器。
+3. **浏览器直连本机反代 / Anthropic API**:以上都没有时，默认调用 `http://127.0.0.1:8787`（Key 填 `unused`）；也可在设置里改为官方 API。图片/PDF 在浏览器里转 base64 直接发给模型，历史记录存本浏览器。
 
 ## 使用
 

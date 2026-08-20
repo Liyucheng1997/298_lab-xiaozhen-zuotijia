@@ -29,8 +29,8 @@ let pickedFiles = []; // File[]
 let timerId = null;
 
 // ---------- 设置(直连 API 模式用,只存本机浏览器) ----------
-const SETTINGS_KEY = 'zuotijia-settings';
-const DEFAULT_SETTINGS = { apiKey: '', baseUrl: 'https://api.anthropic.com', model: 'claude-sonnet-5' };
+const SETTINGS_KEY = 'zuotijia-settings-v2';
+const DEFAULT_SETTINGS = { apiKey: 'unused', baseUrl: 'http://127.0.0.1:8787', model: 'haiku' };
 function loadSettings() {
   try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; }
   catch { return { ...DEFAULT_SETTINGS }; }
@@ -43,8 +43,8 @@ settingsBtn.addEventListener('click', () => {
   setModel.value = settings.model;
   setUseLocal.checked = localStorage.getItem(LOCAL_FLAG) === '1';
   settingsBackendInfo.textContent = backend.mode === 'server'
-    ? '当前走 claude CLI 后端(订阅额度,无需 API Key);以下配置仅在 CLI 不可用时生效。'
-    : '未检测到 claude CLI 后端,识题走浏览器直连 Anthropic API,请填写你自己的 API Key。';
+    ? '当前走项目自带的 claude CLI 后端；以下反代配置在该后端不可用时生效。'
+    : '识题将由浏览器直接调用下面的本机 claude -p 反代或 Anthropic 兼容接口。';
   settingsMask.classList.remove('hidden');
 });
 settingsCancel.addEventListener('click', () => settingsMask.classList.add('hidden'));
@@ -105,7 +105,8 @@ function updateBadge() {
     backendBadge.textContent = backend.base ? '本机 Claude ✓' : '本地 Claude ✓';
     backendBadge.className = 'backend-badge ok';
   } else if (backend.mode === 'direct') {
-    backendBadge.textContent = settings.apiKey ? 'API 直连 ✓' : '未配置 API Key';
+    const localProxy = /^(https?:\/\/)?(localhost|127\.0\.0\.1)(:|\/|$)/.test(settings.baseUrl);
+    backendBadge.textContent = settings.apiKey ? (localProxy ? 'Claude 反代 ✓' : 'API 直连 ✓') : '未配置 API Key';
     backendBadge.className = 'backend-badge ' + (settings.apiKey ? 'ok' : 'warn');
   } else {
     backendBadge.textContent = '检测后端中…';
@@ -176,7 +177,7 @@ solveBtn.addEventListener('click', async () => {
 
   await backendReady;
   if (backend.mode === 'direct' && !settings.apiKey) {
-    showStatus('请先点右上角「⚙️ 设置」填写 Anthropic API Key(或在本机运行带 claude CLI 的服务)', true);
+    showStatus('请先点右上角「⚙️ 设置」填写反代/API Key，未启用鉴权的本机反代可填 unused', true);
     settingsBtn.click();
     return;
   }
