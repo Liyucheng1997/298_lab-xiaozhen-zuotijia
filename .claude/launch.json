@@ -1,11 +1,1 @@
-{
-  "version": "0.0.1",
-  "configurations": [
-    {
-      "name": "xiaozhen",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["start"],
-      "port": 3299
-    }
-  ]
-}
+﻿{ "version": "0.0.1", "configurations": [ { "name": "zuotijia", "runtimeExecutable": "node", "runtimeArgs": ["server.js"], "port": 3299 } ] }

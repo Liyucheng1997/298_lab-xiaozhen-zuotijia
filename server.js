@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const crypto = require('crypto');
 
 const ROOT = __dirname;
@@ -12,6 +12,21 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 fs.mkdirSync(HISTORY_DIR, { recursive: true });
 
 const app = express();
+
+// CORS:允许部署在 zuotijia.liyucheng.me 的页面调用访问者本机的这个服务(优先走本地 claude 订阅额度)
+const ALLOWED_ORIGINS = /^https:\/\/zuotijia\.liyucheng\.me$|^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.test(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static(path.join(ROOT, 'public')));
@@ -152,7 +167,23 @@ ${hints.length ? '\n用户提供的提示:' + hints.join(';') + '\n' : ''}
 
 // ---------- 路由 ----------
 
+// claude CLI 是否可用(缓存首次探测结果);部署在服务器上时通常没有 CLI,前端会改走直连 API
+let cliAvailable = null;
+function hasClaude() {
+  if (cliAvailable !== null) return cliAvailable;
+  const out = spawnSync(process.platform === 'win32' ? 'where' : 'which', ['claude'], { encoding: 'utf8' });
+  cliAvailable = out.status === 0 && !!(out.stdout || '').trim();
+  return cliAvailable;
+}
+
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, service: 'zuotijia', llm: hasClaude() ? 'cli' : 'none' });
+});
+
 app.post('/api/solve', upload.array('files', 6), async (req, res) => {
+  if (!hasClaude()) {
+    return res.status(501).json({ error: '本服务器未安装 claude CLI,请在页面设置中填写 API Key 使用直连模式' });
+  }
   const text = (req.body.text || '').trim();
   const subjectHint = (req.body.subject || '').trim();
   const gradeHint = (req.body.grade || '').trim();

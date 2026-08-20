@@ -1,4 +1,4 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
+﻿* { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   --bg: #f4f5f0;
@@ -254,3 +254,36 @@ textarea:focus, input[type="text"]:focus { outline: 2px solid var(--accent-soft)
   position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 20;
 }
 .history-empty { text-align: center; color: var(--ink-soft); font-size: 13px; padding: 30px 0; }
+
+/* ---------- 后端徽章与设置弹窗 ---------- */
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.backend-badge {
+  font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  background: var(--bg); color: var(--ink-soft);
+  border: 1px solid var(--border);
+}
+.backend-badge.ok { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-soft); }
+.backend-badge.warn { background: #fdf3e0; color: #9a6b1f; border-color: #f0e2c4; }
+
+.modal-mask {
+  position: fixed; inset: 0; z-index: 60;
+  background: rgba(43, 43, 43, 0.45);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal {
+  width: min(460px, calc(100vw - 32px));
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 22px;
+}
+.modal h2 { font-size: 17px; margin-bottom: 6px; }
+.modal-label { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 12px; }
+.modal-label input {
+  width: 100%; margin-top: 5px; padding: 9px 11px;
+  background: var(--bg); color: var(--ink);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px;
+}
+.modal-label input:focus { outline: none; border-color: var(--accent); background: #fff; }
+.modal-hint { font-size: 12.5px; color: var(--ink-soft); line-height: 1.6; margin: 10px 0 0; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.primary-btn.slim { width: auto; padding: 9px 22px; margin: 0; }

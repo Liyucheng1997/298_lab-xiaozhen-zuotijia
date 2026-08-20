@@ -18,7 +18,11 @@
         <p class="tagline">上传试卷 · 识题解答 · 四层深度 · 溯源课本</p>
       </div>
     </div>
-    <button id="historyBtn" class="ghost-btn">🕘 历史记录</button>
+    <div class="topbar-actions">
+      <span id="backendBadge" class="backend-badge" title="当前 AI 后端"></span>
+      <button id="historyBtn" class="ghost-btn">🕘 历史记录</button>
+      <button id="settingsBtn" class="ghost-btn">⚙️ 设置</button>
+    </div>
   </header>
 
   <main class="layout">
@@ -70,6 +74,30 @@
     <div id="historyList" class="history-list"></div>
   </div>
   <div id="drawerMask" class="drawer-mask hidden"></div>
+
+  <!-- 设置弹窗 -->
+  <div id="settingsMask" class="modal-mask hidden">
+    <div class="modal">
+      <h2>设置</h2>
+      <p id="settingsBackendInfo" class="modal-hint"></p>
+      <div id="apiFields">
+        <label class="modal-label">Anthropic API Key
+          <input type="password" id="setApiKey" placeholder="sk-ant-..." />
+        </label>
+        <label class="modal-label">API 地址
+          <input type="text" id="setBaseUrl" placeholder="https://api.anthropic.com" />
+        </label>
+        <label class="modal-label">模型
+          <input type="text" id="setModel" placeholder="claude-sonnet-5" />
+        </label>
+        <p class="modal-hint">Key 只保存在你自己的浏览器(localStorage),识题请求由浏览器直接发给 Anthropic,不经过任何中间服务器。</p>
+      </div>
+      <div class="modal-actions">
+        <button id="settingsCancel" class="ghost-btn">取消</button>
+        <button id="settingsSave" class="primary-btn slim">保存</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
