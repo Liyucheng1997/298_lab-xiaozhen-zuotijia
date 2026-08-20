@@ -23,6 +23,7 @@ const setBaseUrl = document.getElementById('setBaseUrl');
 const setModel = document.getElementById('setModel');
 const settingsSave = document.getElementById('settingsSave');
 const settingsCancel = document.getElementById('settingsCancel');
+const setUseLocal = document.getElementById('setUseLocal');
 
 let pickedFiles = []; // File[]
 let timerId = null;
@@ -40,6 +41,7 @@ settingsBtn.addEventListener('click', () => {
   setApiKey.value = settings.apiKey;
   setBaseUrl.value = settings.baseUrl;
   setModel.value = settings.model;
+  setUseLocal.checked = localStorage.getItem(LOCAL_FLAG) === '1';
   settingsBackendInfo.textContent = backend.mode === 'server'
     ? '当前走 claude CLI 后端(订阅额度,无需 API Key);以下配置仅在 CLI 不可用时生效。'
     : '未检测到 claude CLI 后端,识题走浏览器直连 Anthropic API,请填写你自己的 API Key。';
@@ -47,21 +49,29 @@ settingsBtn.addEventListener('click', () => {
 });
 settingsCancel.addEventListener('click', () => settingsMask.classList.add('hidden'));
 settingsMask.addEventListener('click', (e) => { if (e.target === settingsMask) settingsMask.classList.add('hidden'); });
-settingsSave.addEventListener('click', () => {
+settingsSave.addEventListener('click', async () => {
   settings = {
     apiKey: setApiKey.value.trim(),
     baseUrl: setBaseUrl.value.trim() || DEFAULT_SETTINGS.baseUrl,
     model: setModel.value.trim() || DEFAULT_SETTINGS.model,
   };
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  if (setUseLocal.checked) localStorage.setItem(LOCAL_FLAG, '1');
+  else localStorage.removeItem(LOCAL_FLAG);
   settingsMask.classList.add('hidden');
+  // 重新探测(勾选本机服务时给 15 秒,留时间响应浏览器的本地网络权限询问)
+  backendReady = detectBackend(setUseLocal.checked ? 15000 : 5000);
   updateBadge();
+  await backendReady;
 });
 
 // ---------- 后端探测 ----------
-// 优先级:① 同源服务器带 claude CLI(本地 npm start) ② 访问者本机 localhost:3299 的服务 ③ 浏览器直连 Anthropic API
+// 优先级:① 同源服务器带 claude CLI(本地 npm start) ② 访问者本机 localhost:3299 的服务(需在设置中开启,
+// 因为 Chrome 会为"公网页面访问本机"弹权限询问,不能对每个访客都探测) ③ 浏览器直连 Anthropic API
 const LOCAL_PORT = 3299;
+const LOCAL_FLAG = 'zuotijia-use-local';
 let backend = { mode: 'detecting', base: '' }; // mode: 'server' | 'direct' | 'detecting'
+let backendReady = Promise.resolve();
 
 function fetchTimeout(url, ms) {
   const ctrl = new AbortController();
@@ -69,23 +79,26 @@ function fetchTimeout(url, ms) {
   return fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(t));
 }
 
-async function probeHealth(base) {
+async function probeHealth(base, ms) {
   try {
-    const h = await (await fetchTimeout(base + '/api/health', 2500)).json();
+    const h = await (await fetchTimeout(base + '/api/health', ms || 2500)).json();
     return h && h.ok && h.llm === 'cli';
   } catch { return false; }
 }
 
-const backendReady = (async () => {
+const onLocalPage = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+
+async function detectBackend(localProbeMs) {
   if (await probeHealth('')) { backend = { mode: 'server', base: '' }; }
-  else if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname) &&
-           await probeHealth(`http://localhost:${LOCAL_PORT}`)) {
+  else if (!onLocalPage && localStorage.getItem(LOCAL_FLAG) === '1' &&
+           await probeHealth(`http://localhost:${LOCAL_PORT}`, localProbeMs || 5000)) {
     backend = { mode: 'server', base: `http://localhost:${LOCAL_PORT}` };
   } else {
     backend = { mode: 'direct', base: '' };
   }
   updateBadge();
-})();
+}
+backendReady = detectBackend();
 
 function updateBadge() {
   if (backend.mode === 'server') {
