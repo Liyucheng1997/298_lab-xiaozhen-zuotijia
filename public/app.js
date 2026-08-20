@@ -30,9 +30,16 @@ let timerId = null;
 
 // ---------- 设置(直连 API 模式用,只存本机浏览器) ----------
 const SETTINGS_KEY = 'zuotijia-settings-v2';
-const DEFAULT_SETTINGS = { apiKey: 'unused', baseUrl: 'http://127.0.0.1:8787', model: 'haiku' };
+const DEFAULT_SETTINGS = { apiKey: 'unused', baseUrl: 'http://localhost:8787', model: 'haiku' };
 function loadSettings() {
-  try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; }
+  try {
+    const loaded = { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') };
+    if (loaded.baseUrl === 'http://127.0.0.1:8787') {
+      loaded.baseUrl = 'http://localhost:8787';
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(loaded));
+    }
+    return loaded;
+  }
   catch { return { ...DEFAULT_SETTINGS }; }
 }
 let settings = loadSettings();
